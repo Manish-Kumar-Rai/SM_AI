@@ -42,6 +42,17 @@ shopping_df, walking_df = load_data()
 
 if shopping_df is not None and walking_df is not None:
     st.success("Data successfully loaded from GitHub repository!")
+
+    # --- section to display raw data tables ---
+    st.write("## Raw Data Preview")
+    
+    with st.expander("Show Shopping Data"):
+        st.write("### Shopping Data Table")
+        st.dataframe(shopping_df.head(10))  # Show first 10 rows
+    
+    with st.expander("Show Walking Data"):
+        st.write("### Walking Data Table")
+        st.dataframe(walking_df.head(10))  # Show first 10 rows
     
     # Data preprocessing
     shopping_df['Gender'] = shopping_df['Gender'].map({'M': 0, 'F': 1}).astype(int)
