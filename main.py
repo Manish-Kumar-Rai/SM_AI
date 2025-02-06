@@ -1,3 +1,6 @@
+from streamlit.runtime.scriptrunner import add_script_run_ctx
+add_script_run_ctx()
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,16 +18,30 @@ from sklearn.ensemble import RandomForestClassifier
 import tensorflow as tf
 import tensorboard
 import datetime
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow INFO/WARNING logs
 
 # Streamlit title and description
 st.title("AI & Data Science Project Dashboard")
 st.write("### Interactive analysis of shopping and walking data")
 
-# Upload File
-uploaded_file = st.file_uploader("SM_AI_Project_Data_Updated.xlsx", type=["xlsx"])
-if uploaded_file:
-    shopping_df = pd.read_excel(uploaded_file, sheet_name="Shopping Data")
-    walking_df = pd.read_excel(uploaded_file, sheet_name="Walking Data")
+# Load data directly from GitHub
+DATA_URL = "https://raw.githubusercontent.com/Manish-Kumar-Rai/SM_AI/main/SM_AI_Project_Data_Updated.xlsx"
+
+@st.cache_data  # Cache the data to avoid reloading on every interaction
+def load_data():
+    try:
+        shopping_df = pd.read_excel(DATA_URL, sheet_name="Shopping Data")
+        walking_df = pd.read_excel(DATA_URL, sheet_name="Walking Data")
+        return shopping_df, walking_df
+    except Exception as e:
+        st.error(f"Error loading data: {str(e)}")
+        return None, None
+
+shopping_df, walking_df = load_data()
+
+if shopping_df is not None and walking_df is not None:
+    st.success("Data successfully loaded from GitHub repository!")
     
     # Data preprocessing
     shopping_df['Gender'] = shopping_df['Gender'].map({'M': 0, 'F': 1}).astype(int)
